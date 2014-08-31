@@ -66,7 +66,7 @@ class ArbitrerCLI:
             fname = fnames[0]            
         else:
             fname = None
-        logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+        logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s [%(filename)s:%(lineno)d]',
                             level=level, filename=fname)
         self.create_arbitrer(args)
         self.exec_command(args)

@@ -88,6 +88,35 @@ Run tests
 
     $ nosetests arbitrage/
 
+# DESIGN
+
+The Arbiter class is responsible for finding all trade opportunities and informing registered observers about them.
+It does this at configured intervals, by downloading the current market orders, tickers, and running the 'arbitrage_simple_opportunity' algorithm.
+
+'arbitrage_simple_opportunity' only compares the lowest 'ask' price and the highest 'bid' price.
+There's also 'arbitrage_depth_opportunity' algorithm which is capable of taking several bids and asks into account, but it's not used right now.
+
+Once an arbitrage opportunity is identified, it is sent to an Observer with several parameters like: profit percentage, potential volume, etc.
+The Observer is also notified of beginning and end of each opportunity search round.
+This way the Observer has a selection of opportunities to choose from.
+
+There are multiple implementations of Observer - Logger, TraderBot, EMailer, etc.
+The bots used for automated trading are:
+ * TraderBot - a BTC/USD bot which memorizes all arbitrage opportunities from one round, sorts them by profitability and executes the best one, while:
+  * the profit must be above a configured profit percentage threshold,
+  * both exchanges must be configured and automated,
+  * the traded amount can never be lower than config.min_tx_volume,
+  * the traded amount will be capped by config.max_tx_volume,
+  * the bot will leave at least config.balance_margin  percent of current balance untouched.
+ * SpecializedTraderBot - a version of TraderBot designed for EURO exchanges, also includes some fixes for corrupted data sent by some exchanges,
+ * TraderBotAltCoin - a TraderBot for BTC/AltCoin trades.
+
+All markets have a public and private interface.
+The public one provides orders and tickers, and is used for opportunity search.
+The private one provides access to your account on that exchange and allows for automated trading by bots.
+
+All access keys, and settings are stored in the config.py file.
+
 # TODO
 
  * Tests
